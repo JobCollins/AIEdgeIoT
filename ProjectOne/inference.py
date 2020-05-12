@@ -70,7 +70,7 @@ class Network:
     def get_input_shape(self):
         ### TODO: Return the shape of the input layer ###
         self.input_blob = next(iter(self.network.inputs))
-        self.output_blob  next(iter(self.network.outputs))
+        self.output_blob = next(iter(self.network.outputs))
         
         return self.network.inputs[self.input_blob].shape
 

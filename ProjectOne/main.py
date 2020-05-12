@@ -106,11 +106,11 @@ def infer_on_stream(args, client):
     prob_threshold = args.prob_threshold
 
     ### TODO: Load the model through `infer_network` ###
-    infer_network.load_model(model, device_name, extension)
+    infer_network.load_model(args.model, args.device, args.cpu_extension)
 
     ### TODO: Handle the input stream ###
     image_flag=False
-    if args.i = 'CAM':
+    if args.i == 'CAM':
         args.i=0
     elif args.i.endswith('.jpg') or args.i.endswith('.bmp'):
         image_flag=True
