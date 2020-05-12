@@ -75,6 +75,15 @@ def connect_mqtt():
 
     return client
 
+def observe(result, counter, incident_flag):
+    if result[0][1] == 1 and not incident_flag:
+        timestamp = counter /30
+        print("Person in frame at {:.2f} seconds".format(timestamp))
+        incident_flag=True
+    elif result[0][1] != 1:
+        incident_flag=False
+        
+    return incident_flag
 
 def infer_on_stream(args, client):
     """
@@ -110,6 +119,8 @@ def infer_on_stream(args, client):
         output=None
 
     ### TODO: Loop until stream is over ###
+    counter = 0
+    incident_flag = False
     while video_cap.isOpened():
         ### TODO: Read from the video capture ###
         flag, frame = video_cap.read()
@@ -117,6 +128,8 @@ def infer_on_stream(args, client):
         if not flag:
             break
         key_pressed = cv2.waitKey(60)
+        counter +=1
+        
         ### TODO: Pre-process the image as needed ###
         #resize frame
         frame = cv2.resize(frame, (100,100))
@@ -127,19 +140,18 @@ def infer_on_stream(args, client):
             cv2.imwrite('output_img.jpg', frame)
         else:
             out.write(frame)
-            
         #break with esc key pressed
         if key_pressed==27:
             break
 
         ### TODO: Start asynchronous inference for specified request ###
-
+        infer_network.async_inference(frame)
         ### TODO: Wait for the result ###
-
+        if infer_network.wait()==0:
             ### TODO: Get the results of the inference request ###
-
+            result = infer_network.extract_output()
             ### TODO: Extract any desired stats from the results ###
-
+            
             ### TODO: Calculate and send relevant information on ###
             ### current_count, total_count and duration to the MQTT server ###
             ### Topic "person": keys of "count" and "total" ###
