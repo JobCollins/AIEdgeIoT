@@ -41,6 +41,9 @@ MQTT_PORT = 3001
 MQTT_KEEPALIVE_INTERVAL = 60
 
 
+CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"]
+
+
 def build_argparser():
     """
     Parse command line arguments.
@@ -76,14 +79,17 @@ def connect_mqtt():
     return client
 
 def observe(result, counter, incident_flag):
+    current_count = 0
     if result[0][1] == 1 and not incident_flag:
         timestamp = counter /30
         print("Person in frame at {:.2f} seconds".format(timestamp))
         incident_flag=True
+        current_count = current_count + 1
     elif result[0][1] != 1:
         incident_flag=False
+        current_count=current_count
         
-    return incident_flag
+    return incident_flag, current_count
 
 def infer_on_stream(args, client):
     """
@@ -135,31 +141,46 @@ def infer_on_stream(args, client):
         frame = cv2.resize(frame, (100,100))
         #perform canny edge detection
         frame = cv2.Canny(frame, 100, 200)
-        #write out the frame
-        if image_flag:
-            cv2.imwrite('output_img.jpg', frame)
-        else:
-            out.write(frame)
-        #break with esc key pressed
-        if key_pressed==27:
-            break
+        
 
         ### TODO: Start asynchronous inference for specified request ###
+        infer_start = time.time()
         infer_network.async_inference(frame)
         ### TODO: Wait for the result ###
         if infer_network.wait()==0:
+            last_count = 0
+            total_count = 0
+            start_time = 0
             ### TODO: Get the results of the inference request ###
             result = infer_network.extract_output()
             ### TODO: Extract any desired stats from the results ###
-            
+            incident_flag, current_count = observe(result, counter, incident_flag)
             ### TODO: Calculate and send relevant information on ###
-            ### current_count, total_count and duration to the MQTT server ###
+            ### current_count, total_count and duration to the MQTT server ###                
             ### Topic "person": keys of "count" and "total" ###
             ### Topic "person/duration": key of "duration" ###
+            if current_count > last_count:
+                entry_time = time.time()
+                total_count = total_count + current_count
+                client.publish("person", json.dumps({"total": total_count}))
+            elif current_count < last_count:
+                time_taken = int(time.time() - start_time)
+                client.publish("person/duration", json.dumps({"duration": time_taken}))
+                
+            client.publish("person", json.dumps({"count": current_count}))
+            last_count = current_count
 
         ### TODO: Send the frame to the FFMPEG server ###
-
+        sys.stdout.buffer.write(frame)
+        sys.stdout.flush()
         ### TODO: Write an output image if `single_image_mode` ###
+        if image_flag:
+            cv2.imwrite('output_image.jpg', frame)
+            
+    video_cap.release()
+    cv2.destroyAllWindows()
+    client.disconnect()
+    infer_network.clean()
 
 
 def main():
