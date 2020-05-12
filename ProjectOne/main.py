@@ -102,12 +102,35 @@ def infer_on_stream(args, client):
         
     video_cap = cv2.VideoCapture(args.i)
     video_cap.open(args.i)
+    
+    #video writer for output video
+    if not image_flag:
+        output = cv2.VideoWriter('output.mp4', cv2.VideoWriter_fourcc('M','J','P','G'), 30, (100,100))
+    else:
+        output=None
 
     ### TODO: Loop until stream is over ###
-
+    while video_cap.isOpened():
         ### TODO: Read from the video capture ###
-
+        flag, frame = video_cap.read()
+        
+        if not flag:
+            break
+        key_pressed = cv2.waitKey(60)
         ### TODO: Pre-process the image as needed ###
+        #resize frame
+        frame = cv2.resize(frame, (100,100))
+        #perform canny edge detection
+        frame = cv2.Canny(frame, 100, 200)
+        #write out the frame
+        if image_flag:
+            cv2.imwrite('output_img.jpg', frame)
+        else:
+            out.write(frame)
+            
+        #break with esc key pressed
+        if key_pressed==27:
+            break
 
         ### TODO: Start asynchronous inference for specified request ###
 
