@@ -106,8 +106,7 @@ def infer_on_stream(args, client):
     prob_threshold = args.prob_threshold
 
     ### TODO: Load the model through `infer_network` ###
-    infer_network.load_model(args.model, args.device, args.cpu_extension)
-    input_shape = infer_network.get_input_shape()
+    n,c,h,w = infer_network.load_model(args.model, args.device, args.cpu_extension)[1]
     
     ### TODO: Handle the input stream ###
     image_flag=False
@@ -119,11 +118,11 @@ def infer_on_stream(args, client):
     video_cap = cv2.VideoCapture(args.input)
     video_cap.open(args.input)
     
-    #video writer for output video
-    if not image_flag:
-        output = cv2.VideoWriter('output.mp4', cv2.VideoWriter_fourcc('M','J','P','G'), 30, (input_shape[3],input_shape[2]))
-    else:
-        output=None
+#     #video writer for output video
+#     if not image_flag:
+#         output = cv2.VideoWriter('output.mp4', cv2.VideoWriter_fourcc('M','J','P','G'), 30, (input_shape[3],input_shape[2]))
+#     else:
+#         output=None
 
     ### TODO: Loop until stream is over ###
     counter = 0
@@ -139,9 +138,9 @@ def infer_on_stream(args, client):
         
         ### TODO: Pre-process the image as needed ###
         #resize frame
-        frame = cv2.resize(frame, (input_shape[3],input_shape[2]))
-        frame = frame.transpose((2,0,1))
-        frame = frame.reshape(1, *frame.shape)
+        image = cv2.resize(frame, (w,h))
+        image = image.transpose((2,0,1))
+        image = image.reshape((n, c, h, w))
         #perform canny edge detection
         frame = cv2.Canny(frame, 100, 200)
         
@@ -149,7 +148,7 @@ def infer_on_stream(args, client):
         ### TODO: Start asynchronous inference for specified request ###
         request_id = 0
         infer_start = time.time()
-        infer_network.exec_net(request_id, frame)
+        infer_network.exec_net(request_id, image)
         ### TODO: Wait for the result ###
         if infer_network.wait(request_id)==0:
             last_count = 0

@@ -63,15 +63,15 @@ class Network:
         ### TODO: Return the loaded inference plugin ###
         self.ex_net = self.core.load_network(self.network, "CPU")
         print("IR loaded successfully")
-        ### Note: You may need to update the function parameters. ###
         
-        return self.ex_net
-
-    def get_input_shape(self):
-        ### TODO: Return the shape of the input layer ###
         self.input_blob = next(iter(self.network.inputs))
         self.output_blob = next(iter(self.network.outputs))
+        ### Note: You may need to update the function parameters. ###
         
+        return self.ex_net, self.get_input_shape()
+
+    def get_input_shape(self):
+        ### TODO: Return the shape of the input layer ###        
         return self.network.inputs[self.input_blob].shape
 
     def exec_net(self, request_id, frame):
