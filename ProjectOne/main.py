@@ -107,20 +107,21 @@ def infer_on_stream(args, client):
 
     ### TODO: Load the model through `infer_network` ###
     infer_network.load_model(args.model, args.device, args.cpu_extension)
-
+    input_shape = infer_network.get_input_shape()
+    
     ### TODO: Handle the input stream ###
     image_flag=False
-    if args.i == 'CAM':
-        args.i=0
-    elif args.i.endswith('.jpg') or args.i.endswith('.bmp'):
+    if args.input == 'CAM':
+        args.input=0
+    elif args.input.endswith('.jpg') or args.input.endswith('.bmp'):
         image_flag=True
         
-    video_cap = cv2.VideoCapture(args.i)
-    video_cap.open(args.i)
+    video_cap = cv2.VideoCapture(args.input)
+    video_cap.open(args.input)
     
     #video writer for output video
     if not image_flag:
-        output = cv2.VideoWriter('output.mp4', cv2.VideoWriter_fourcc('M','J','P','G'), 30, (100,100))
+        output = cv2.VideoWriter('output.mp4', cv2.VideoWriter_fourcc('M','J','P','G'), 30, (input_shape[3],input_shape[2]))
     else:
         output=None
 
@@ -138,7 +139,9 @@ def infer_on_stream(args, client):
         
         ### TODO: Pre-process the image as needed ###
         #resize frame
-        frame = cv2.resize(frame, (100,100))
+        frame = cv2.resize(frame, (input_shape[3],input_shape[2]))
+        frame = frame.transpose((2,0,1))
+        frame = frame.reshape(1, *frame.shape)
         #perform canny edge detection
         frame = cv2.Canny(frame, 100, 200)
         
