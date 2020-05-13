@@ -147,15 +147,16 @@ def infer_on_stream(args, client):
         
 
         ### TODO: Start asynchronous inference for specified request ###
+        request_id = 0
         infer_start = time.time()
-        infer_network.async_inference(frame)
+        infer_network.exec_net(request_id, frame)
         ### TODO: Wait for the result ###
-        if infer_network.wait()==0:
+        if infer_network.wait(request_id)==0:
             last_count = 0
             total_count = 0
             start_time = 0
             ### TODO: Get the results of the inference request ###
-            result = infer_network.extract_output()
+            result = infer_network.get_output(request_id)
             ### TODO: Extract any desired stats from the results ###
             incident_flag, current_count = observe(result, counter, incident_flag)
             ### TODO: Calculate and send relevant information on ###
