@@ -78,18 +78,19 @@ def connect_mqtt():
 
     return client
 
-def observe(result, counter, incident_flag):
+def observe(frame, result):
     current_count = 0
-    if result[0][1] == 1 and not incident_flag:
-        timestamp = counter /30
-        print("Person in frame at {:.2f} seconds".format(timestamp))
-        incident_flag=True
-        current_count = current_count + 1
-    elif result[0][1] != 1:
-        incident_flag=False
-        current_count=current_count
+    for object in result[0][0]:
+        # Draw bounding box for object
+        if object[2] > prob_threshold:
+            xmin = int(object[3] * initial_w)
+            ymin = int(object[4] * initial_h)
+            xmax = int(object[5] * initial_w)
+            ymax = int(object[6] * initial_h)
+            cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 55, 255), 1)
+            current_count = current_count + 1
         
-    return incident_flag, current_count
+    return frame, current_count
 
 def infer_on_stream(args, client):
     """
@@ -103,6 +104,7 @@ def infer_on_stream(args, client):
     # Initialise the class
     infer_network = Network()
     # Set Probability threshold for detections
+    global prob_threshold
     prob_threshold = args.prob_threshold
 
     ### TODO: Load the model through `infer_network` ###
@@ -118,6 +120,9 @@ def infer_on_stream(args, client):
     video_cap = cv2.VideoCapture(args.input)
     video_cap.open(args.input)
     
+    global initial_w, initial_h
+    initial_w = video_cap.get(3)
+    initial_h = video_cap.get(4)
 #     #video writer for output video
 #     if not image_flag:
 #         output = cv2.VideoWriter('output.mp4', cv2.VideoWriter_fourcc('M','J','P','G'), 30, (input_shape[3],input_shape[2]))
@@ -157,7 +162,7 @@ def infer_on_stream(args, client):
             ### TODO: Get the results of the inference request ###
             result = infer_network.get_output(request_id)
             ### TODO: Extract any desired stats from the results ###
-            incident_flag, current_count = observe(result, counter, incident_flag)
+            frame, current_count = observe(frame, result)
             ### TODO: Calculate and send relevant information on ###
             ### current_count, total_count and duration to the MQTT server ###                
             ### Topic "person": keys of "count" and "total" ###
