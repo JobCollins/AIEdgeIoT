@@ -41,8 +41,6 @@ MQTT_PORT = 3001
 MQTT_KEEPALIVE_INTERVAL = 60
 
 
-CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"]
-
 
 def build_argparser():
     """
@@ -80,13 +78,13 @@ def connect_mqtt():
 
 def observe(frame, result):
     current_count = 0
-    for object in result[0][0]:
+    for item in result[0][0]:
         # Draw bounding box for object
-        if object[2] > prob_threshold:
-            xmin = int(object[3] * initial_w)
-            ymin = int(object[4] * initial_h)
-            xmax = int(object[5] * initial_w)
-            ymax = int(object[6] * initial_h)
+        if item[2] > prob_threshold:
+            xmin = int(item[3] * initial_w)
+            ymin = int(item[4] * initial_h)
+            xmax = int(item[5] * initial_w)
+            ymax = int(item[6] * initial_h)
             cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 55, 255), 1)
             current_count = current_count + 1
         
@@ -101,6 +99,12 @@ def infer_on_stream(args, client):
     :param client: MQTT client
     :return: None
     """
+    
+    client = mqtt.Client()
+    client.connect(MQTT_HOST, MQTT_PORT, MQTT_KEEPALIVE_INTERVAL)
+
+    args = build_argparser().parse_args()
+    
     # Initialise the class
     infer_network = Network()
     # Set Probability threshold for detections
@@ -131,7 +135,6 @@ def infer_on_stream(args, client):
 
     ### TODO: Loop until stream is over ###
     counter = 0
-    incident_flag = False
     while video_cap.isOpened():
         ### TODO: Read from the video capture ###
         flag, frame = video_cap.read()
@@ -146,8 +149,6 @@ def infer_on_stream(args, client):
         image = cv2.resize(frame, (w,h))
         image = image.transpose((2,0,1))
         image = image.reshape((n, c, h, w))
-        #perform canny edge detection
-        frame = cv2.Canny(frame, 100, 200)
         
 
         ### TODO: Start asynchronous inference for specified request ###
@@ -169,9 +170,10 @@ def infer_on_stream(args, client):
             ### Topic "person/duration": key of "duration" ###
             if current_count > last_count:
                 entry_time = time.time()
-                total_count = total_count + current_count
+                total_count = total_count + current_count - last_count
                 client.publish("person", json.dumps({"total": total_count}))
-            elif current_count < last_count:
+            
+            if current_count < last_count:
                 time_taken = int(time.time() - start_time)
                 client.publish("person/duration", json.dumps({"duration": time_taken}))
                 
