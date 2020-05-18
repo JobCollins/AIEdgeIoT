@@ -170,7 +170,7 @@ def infer_on_stream(args, client):
             ### current_count, total_count and duration to the MQTT server ###                
             ### Topic "person": keys of "count" and "total" ###
             ### Topic "person/duration": key of "duration" ###
-            if counter % 30 == 0:
+            if counter % 35 == 0:
                 if current_count > last_count:
                     entry_time = time.time()
                     total_count = total_count + current_count - last_count
