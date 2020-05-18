@@ -127,11 +127,10 @@ def infer_on_stream(args, client):
     global initial_w, initial_h
     initial_w = video_cap.get(3)
     initial_h = video_cap.get(4)
-#     #video writer for output video
-#     if not image_flag:
-#         output = cv2.VideoWriter('output.mp4', cv2.VideoWriter_fourcc('M','J','P','G'), 30, (input_shape[3],input_shape[2]))
-#     else:
-#         output=None
+
+    last_count = 0
+    total_count = 0
+    start_time = 0
 
     ### TODO: Loop until stream is over ###
     counter = 0
@@ -155,11 +154,10 @@ def infer_on_stream(args, client):
         request_id = 0
         infer_start = time.time()
         infer_network.exec_net(request_id, image)
+        
         ### TODO: Wait for the result ###
         if infer_network.wait(request_id)==0:
-            last_count = 0
-            total_count = 0
-            start_time = 0
+            
             ### TODO: Get the results of the inference request ###
             result = infer_network.get_output(request_id)
             ### TODO: Extract any desired stats from the results ###
@@ -174,7 +172,7 @@ def infer_on_stream(args, client):
                 client.publish("person", json.dumps({"total": total_count}))
             
             if current_count < last_count:
-                time_taken = int(time.time() - start_time)
+                time_taken = int(time.time() - entry_time)
                 client.publish("person/duration", json.dumps({"duration": time_taken}))
                 
             client.publish("person", json.dumps({"count": current_count}))
@@ -190,7 +188,6 @@ def infer_on_stream(args, client):
     video_cap.release()
     cv2.destroyAllWindows()
     client.disconnect()
-    infer_network.clean()
 
 
 def main():
