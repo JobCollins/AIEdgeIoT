@@ -6,6 +6,7 @@ Repository for my Intel Edge AI for IoT Nanodegree projects
 
 This app uses a person detection TensorFlow model(ssd_mobilenet_v2_coco) from https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md 
 I convert it to an Intermediate Representation for use with the Model Optimizer using the command
+
 `python /opt/intel/openvino/deployment_tools/model_optimizer/mo.py --input_model ssd_mobilenet_v2_coco_2018_03_29/frozen_inference_graph.pb --tensorflow_object_detection_api_pipeline_config ssd_mobilenet_v2_coco_2018_03_29/pipeline.config --reverse_input_channels --tensorflow_use_custom_operations_config /opt/intel/openvino/deployment_tools/model_optimizer/extensions/front/tf/ssd_v2_support.json
 `
 
