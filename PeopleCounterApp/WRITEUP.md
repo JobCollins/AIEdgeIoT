@@ -18,7 +18,22 @@ Some of the potential reasons for handling custom layers are...
 My method(s) to compare models before and after conversion to Intermediate Representations
 were...
 
-using the TensorFlow Model Analysis. (Not yet done with ths part)
+For inference time I used the time() module and calculated the difference between time before inference and after inference. A python notebook *ssd mobilenet_v2 inferencing* is included.
+1. The model .pb file took just over *0.05 seconds* to run inference.
+2. The IR model file took just over *0.07 seconds* to run inference.
+
+For the size comparison, the .pb file is *66.4 MB* while the IR .bin file is *64.2 MB*. That is over 2 MB lighter.
+
+For the model accuracy;
+
+1. I computed the precision and recall values for the top-3 predictions. Out of the top-3 predictions, I picked those that were correct *x*.
+2. Worked out the precision . 
+3. Then the recall.
+4. Repeated this process for the images' the top-3 predictions. This process yields a list of precision values.
+5. The next step  I computed the average for all the top-3 values to get the Average Precision (AP). 
+6. Computed the mean of the APs for each class, giving us a mAP for each individual class, and averaged them together to yield mAP of the model.
+
+The IR model had a mAP value of 23 while the pre-IR model had a value of 25.
 
 ## Assess Model Use Cases
 
