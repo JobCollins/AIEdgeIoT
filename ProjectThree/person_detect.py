@@ -70,22 +70,22 @@ class PersonDetect:
         '''
         TODO: This method needs to be completed by you
         '''
-        image = preprocess_input(image)
+        image = self.preprocess_input(image)
         
         #perform async inference
-        exec_net = load_model()
+        exec_net = self.load_model()
         
         exec_net.start_async(
             request_id = 0, inputs = {self.input_name:image}
         )
         
         #wait for the results
-        if exec_net.requests[request_id].wait(-1)==0:
-            result = exec_net.requests[request_id].outputs[self.output_blob]
+        if exec_net.requests[0].wait(-1)==0:
+            result = exec_net.requests[0].outputs[self.output_name]
         
-        coords = preprocess_outputs(result, image)
+        coords = self.preprocess_outputs(result, image)
         
-        image = draw_outputs(coords, image)
+        image = self.draw_outputs(coords, image)
         
         return coords, image
     
@@ -95,7 +95,7 @@ class PersonDetect:
         '''
         frame_out = image.copy()
         for item in coords:
-            cv2.rectangle(frame_out, coord[:2], coord[2:], (0, 55, 255), 1 )
+            cv2.rectangle(frame_out, item[:2], item[2:], (255, 0, 0), 2 )
         
         return frame_out
 
