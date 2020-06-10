@@ -58,30 +58,26 @@ class PersonDetect:
         '''
         TODO: This method needs to be completed by you
         '''
-        
-        model = self.model
-        
-        core = IECore()
-        net = core.load_network(network=model, device_name=args.device)
                 
-        return net
+        core = IECore()
+        self.net = core.load_network(network=self.model, device_name=args.device)
+        
         
     def predict(self, image):
         '''
         TODO: This method needs to be completed by you
         '''
-        image = self.preprocess_input(image)
+        predict_image = self.preprocess_input(image)
         
         #perform async inference
-        exec_net = self.load_model()
         
-        exec_net.start_async(
-            request_id = 0, inputs = {self.input_name:image}
+        self.net.start_async(
+            request_id = 0, inputs = {self.input_name:predict_image}
         )
         
         #wait for the results
-        if exec_net.requests[0].wait(-1)==0:
-            result = exec_net.requests[0].outputs[self.output_name]
+        if self.net.requests[0].wait(-1)==0:
+            result = self.net.requests[0].outputs[self.output_name]
         
         coords = self.preprocess_outputs(result, image)
         
@@ -95,7 +91,7 @@ class PersonDetect:
         '''
         frame_out = image.copy()
         for item in coords:
-            cv2.rectangle(frame_out, item[:2], item[2:], (255, 0, 0), 2 )
+            cv2.rectangle(frame_out, item[:2], item[2:], (0, 255, 0), 2 )
         
         return frame_out
 
