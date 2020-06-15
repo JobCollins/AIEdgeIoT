@@ -18,3 +18,28 @@ To convert the model into an Intermediate Representation for use with the Model 
 
 Utilizing the Inference Engine, I use the model to perform inference on an input video, and extract useful data concerning the count of people in frame and how long they stay in frame. The app then sends this information over MQTT, as well as sending the output frame, in order to view it from a separate UI server over a network.
 
+
+## Smart Queueing System
+
+This project uses the Intel Dev Cloud to build and test AI at the edge. Specifically, the app reduces congestion in queueing scenario. The app uses the Intel OpenVINO API and the person detection model https://docs.openvinotoolkit.org/2019_R1/_person_detection_retail_0013_description_person_detection_retail_0013.html) from the Intel Open Model Zoo to count people in a queue so as to direct them to the least congested queue.
+
+The three scenarios you'll be looking at are:
+
+1. Scenario 1: Manufacturing Sector
+2. Scenario 2: Retail Sector
+3. Scenario 3: Transportation Sector
+
+### Hardware Proposal
+
+All of the scenarios involve people in queues, but each scenario will require different hardware. So the first task will be to determine which hardware might work for each scenario—and then explain the initial choice in a proposal document.
+
+Later, after building and testing the application on each hardware device for all three scenarios, a review of the results is done and validate or update the initial proposed choices in the proposal document.
+
+### Testing the Hardware
+
+With the initial hypothesis about what hardware might work for the client, it's time to test it and see how it performs!
+
+In the SmartQueueingSystem/ProjectThree folder, you'll find notebooks where there's a build out of the smart queuing application and test of its performance on all four different hardware types (CPU, IGPU, VPU, and FPGA) using the DevCloud.
+
+
+
