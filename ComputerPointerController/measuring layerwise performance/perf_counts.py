@@ -3,8 +3,6 @@ from openvino.inference_engine import IENetwork
 from openvino.inference_engine import IEPlugin
 
 import pprint
-import os
-import cv2
 import argparse
 import sys
 
@@ -18,22 +16,24 @@ def main(args):
     model_weights=model+'.bin'
     model_structure=model+'.xml'
     
-    model=IENetwork(model_structure, model_weights)
+    # TODO: Load the model
+    model = IENetwork(model_structure, model_weights)
     plugin = IEPlugin(device=device)
-
-    # Loading network to device
+    
     net = plugin.load(network=model, num_requests=1)
-
-    # Get the name of the input node
-    input_name=next(iter(model.inputs))
+    
+    input_name = next(iter(model.inputs))
 
     # Reading and Preprocessing Image
     input_img=np.load(image_path)
     input_img=input_img.reshape(1, 28, 28)
+    
+    input_dict = {input_name:input_img}
 
-    # Running Inference
-    net.requests[0].infer({input_name:input_img})
+    # TODO: Run Inference and print the layerwise performance
+    net.requests[0].infer(input_dict)
     pp.pprint(net.requests[0].get_perf_counts())
+    
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser()
