@@ -3,7 +3,7 @@ This is a sample class for a model. You may choose to use it as-is or make any c
 This has been provided just to give you an idea of how to structure your model class.
 '''
 
-class Model_X:
+class Head_pose:
     '''
     Class for the Face Detection Model.
     '''
@@ -11,7 +11,17 @@ class Model_X:
         '''
         TODO: Use this to set your instance variables.
         '''
-        raise NotImplementedError
+        self.model_weights=model_name+'.bin'
+        self.model_structure=model_name+'.xml'
+        self.device=device
+        self.threshold=threshold
+        self.input_name = None
+        self.input_shape = None
+        self.output_name = None
+        self.output_shape = None
+        self.network = None
+        self.model = IENetwork(self.model_structure, self.model_weights)
+        self.core = IECore()
 
     def load_model(self):
         '''
@@ -19,14 +29,23 @@ class Model_X:
         This method is for loading the model to the device specified by the user.
         If your model requires any Plugins, this is where you can load them.
         '''
-        raise NotImplementedError
+        self.network = self.core.load_network(network=self.model, device_name=self.device, num_requests=1)
 
     def predict(self, image):
         '''
         TODO: You will need to complete this method.
         This method is meant for running predictions on the input image.
         '''
-        raise NotImplementedError
+        pred_img = self.preprocess_input(image)
+        self.network.start_async(
+            request_id=0, inputs={self.input_name: pred_img}
+        )
+
+        if self.wait() == 0:
+            outputs = self.network.requests[0].output_shape
+            output = self.preprocess_output(outputs)
+
+        return output
 
     def check_model(self):
         raise NotImplementedError
@@ -36,11 +55,27 @@ class Model_X:
     Before feeding the data into the model for inference,
     you might have to preprocess it. This function is where you can do that.
     '''
-        raise NotImplementedError
+        w, h = self.input_shape[3], self.input_shape[2]
+        image = cv2.resize(image, (w, h))
+        image = image.transpose((2, 0, 1))
+        image = image.reshape(1, 3, h, w)
+
+        return image
 
     def preprocess_output(self, outputs):
     '''
     Before feeding the output of this model to the next model,
     you might have to preprocess the output. This function is where you can do that.
     '''
-        raise NotImplementedError
+       processed_output = []
+
+       processed_output.append(outputs['angle_y_fc'][0][0])
+       processed_output.append(outputs['angle_p_fc'][0][0])
+       processed_output.append(outputs['angle_r_fc'][0][0])
+
+       return processed_output
+
+
+    def wait(self):
+        
+        return self.network.requests[0].wait(-1)
