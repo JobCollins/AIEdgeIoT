@@ -11,35 +11,23 @@ class Model_X:
         '''
         TODO: Use this to set your instance variables.
         '''
-        self.model_weights=model_name+'.bin'
-        self.model_structure=model_name+'.xml'
-        self.device=device
-        self.threshold=threshold
-        self.input_name = None
-        self.input_shape = None
-        self.output_name = None
-        self.output_shape = None
-        self.network = None
-        self.model = IENetwork(self.model_structure, self.model_weights)
-        self.core = IECore()
+        Model_X.__init__(self, model_name, device='CPU',extensions=None, threshold=0.6)
+        self.model_name = 'Gaze Esimation'
+        self.input_name = [k for k in self.model.inputs.keys()]
+        self.input_shape = self.model.inputs[self.input_name[1]].shape
+        self.output_name = [k for k in self.model.outputs.keys()]
 
-
-    def load_model(self):
-        '''
-        TODO: You will need to complete this method.
-        This method is for loading the model to the device specified by the user.
-        If your model requires any Plugins, this is where you can load them.
-        '''
-        self.network = self.core.load_network(network=self.model, device_name=self.device, num_requests=1)
-
-    def predict(self, left_eye, right_eye, coords, request_id=0):
+    
+    def predict(self, left_eye, right_eye, coords, request_id):
         '''
         TODO: You will need to complete this method.
         This method is meant for running predictions on the input image.
         '''
         left_eye = self.preprocess_input(left_eye)
         right_eye = self.preprocess_input(right_eye)
-        self.network.start_async(request_id, inputs={
+        self.network.start_async(
+            request_id=0, 
+            inputs={
             'left_eye': left_eye,
             'right_eye': right_eye,
             'head_pose_coords': coords
@@ -51,20 +39,6 @@ class Model_X:
 
         return mouse_coords, gaze_coords
 
-    def check_model(self):
-        raise NotImplementedError
-
-    def preprocess_input(self, image):
-    '''
-    Before feeding the data into the model for inference,
-    you might have to preprocess it. This function is where you can do that.
-    '''
-        w, h = self.input_shape[3], self.input_shape[2]
-        image = cv2.resize(image, (w, h))
-        image = image.transpose((2, 0, 1))
-        image = image.reshape(1, 3, h, w)
-
-        return image
 
     def preprocess_output(self, outputs, coords):
     '''

@@ -1,9 +1,6 @@
-'''
-This is a sample class for a model. You may choose to use it as-is or make any changes to it.
-This has been provided just to give you an idea of how to structure your model class.
-'''
+from model import Model_X
 
-class Landmark_Detection:
+class Landmark_Detection(Model_X):
     '''
     Class for the Face Detection Model.
     '''
@@ -11,27 +8,13 @@ class Landmark_Detection:
         '''
         TODO: Use this to set your instance variables.
         '''
-        self.model_weights=model_name+'.bin'
-        self.model_structure=model_name+'.xml'
-        self.device=device
-        self.threshold=threshold
-        self.input_name = None
-        self.input_shape = None
-        self.output_name = None
-        self.output_shape = None
-        self.network = None
-        self.model = IENetwork(self.model_structure, self.model_weights)
-        self.core = IECore()
+        Model_X.__init__(self, model_name, device='CPU',extensions=None, threshold=0.6)
+        self.model_name = 'Facial Landmarks Detection'
+        self.input_name = next(iter(self.model.inputs))
+        self.input_shape = self.model.inputs[self.input_name].shape
+        self.output_name = next(iter(self.model.outputs))
 
-    def load_model(self):
-        '''
-        TODO: You will need to complete this method.
-        This method is for loading the model to the device specified by the user.
-        If your model requires any Plugins, this is where you can load them.
-        '''
-        self.network = self.core.load_network(network=self.model, device_name=self.device, num_requests=1)
-
-
+    
     def predict(self, image):
         '''
         TODO: You will need to complete this method.
@@ -42,27 +25,14 @@ class Landmark_Detection:
             request_id=0, inputs={self.input_name: pred_img}
         )
 
+        left_eye, right_eye, eye_coords = [], [], []
+
         if self.wait() == 0:
             outputs = self.network.requests[0].outputs[self.output_name]
             left_eye, right_eye, eye_coords = self.preprocess_output(outputs, image)
 
         return left_eye, right_eye, eye_coords
 
-
-    def check_model(self):
-        raise NotImplementedError
-
-    def preprocess_input(self, image):
-    '''
-    Before feeding the data into the model for inference,
-    you might have to preprocess it. This function is where you can do that.
-    '''
-        w, h = self.input_shape[3], self.input_shape[2]
-        image = cv2.resize(image, (w, h))
-        image = image.transpose((2, 0, 1))
-        image = image.reshape(1, 3, h, w)
-
-        return image
 
     def preprocess_output(self, outputs, image):
     '''
@@ -89,7 +59,3 @@ class Landmark_Detection:
        eye_coords = [[left_eye_xmin, left_eye_ymin, left_eye_xmax, left_eye_ymax], [right_eye_xmin, right_eye_ymin, right_eye_xmax, right_eye_ymax]]
 
        return left_eye, right_eye, eye_coords
-
-    def wait(self):
-        
-        return self.network.requests[0].wait(-1)

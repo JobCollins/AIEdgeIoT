@@ -1,9 +1,6 @@
-'''
-This is a sample class for a model. You may choose to use it as-is or make any changes to it.
-This has been provided just to give you an idea of how to structure your model class.
-'''
+from model import Model_X
 
-class Head_pose:
+class Head_pose(Model_X):
     '''
     Class for the Face Detection Model.
     '''
@@ -11,25 +8,12 @@ class Head_pose:
         '''
         TODO: Use this to set your instance variables.
         '''
-        self.model_weights=model_name+'.bin'
-        self.model_structure=model_name+'.xml'
-        self.device=device
-        self.threshold=threshold
-        self.input_name = None
-        self.input_shape = None
-        self.output_name = None
-        self.output_shape = None
-        self.network = None
-        self.model = IENetwork(self.model_structure, self.model_weights)
-        self.core = IECore()
-
-    def load_model(self):
-        '''
-        TODO: You will need to complete this method.
-        This method is for loading the model to the device specified by the user.
-        If your model requires any Plugins, this is where you can load them.
-        '''
-        self.network = self.core.load_network(network=self.model, device_name=self.device, num_requests=1)
+        Model_X.__init__(self, model_name, device='CPU',extensions=None, threshold=0.6)
+        self.model_name = 'Head Pose Estimation'
+        self.input_name = next(iter(self.model.inputs))
+        self.input_shape = self.model.inputs[self.input_name].shape
+        self.output_name = next(iter(self.model.outputs))
+        self.output_shape = self.model.outputs[self.output_name].shape
 
     def predict(self, image):
         '''
@@ -47,20 +31,6 @@ class Head_pose:
 
         return output
 
-    def check_model(self):
-        raise NotImplementedError
-
-    def preprocess_input(self, image):
-    '''
-    Before feeding the data into the model for inference,
-    you might have to preprocess it. This function is where you can do that.
-    '''
-        w, h = self.input_shape[3], self.input_shape[2]
-        image = cv2.resize(image, (w, h))
-        image = image.transpose((2, 0, 1))
-        image = image.reshape(1, 3, h, w)
-
-        return image
 
     def preprocess_output(self, outputs):
     '''
@@ -76,6 +46,3 @@ class Head_pose:
        return processed_output
 
 
-    def wait(self):
-        
-        return self.network.requests[0].wait(-1)

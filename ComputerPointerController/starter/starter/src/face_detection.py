@@ -8,8 +8,9 @@ import cv2
 import logging as log
 from openvino.inference_engine import IENetwork, IECore
 
+from model import Model_X
 
-class Face_detection:
+class Face_detection(Model_X):
     '''
     Class for the Face Detection Model.
     '''
@@ -17,27 +18,13 @@ class Face_detection:
         '''
         TODO: Use this to set your instance variables.
         '''
-        self.model_weights=model_name+'.bin'
-        self.model_structure=model_name+'.xml'
-        self.device=device
-        self.threshold=threshold
-        self.input_name = None
-        self.input_shape = None
-        self.output_name = None
-        self.output_shape = None
-        self.network = None
-        self.model = IENetwork(self.model_structure, self.model_weights)
-        self.core = IECore()
+        Model_X.__init__(self, model_name, device='CPU',extensions=None, threshold=0.6)
+        self.model_name = 'Face Detection'
+        self.input_name = next(iter(self.model.inputs))
+        self.input_shape = self.model.inputs[self.input_name].shape
+        self.output_name = next(iter(self.model.outputs))
+        self.output_shape = self.model.outputs[self.output_name].shape
 
-        
-
-    def load_model(self):
-        '''
-        TODO: You will need to complete this method.
-        This method is for loading the model to the device specified by the user.
-        If your model requires any Plugins, this is where you can load them.
-        '''
-        self.network = self.core.load_network(network=self.model, device_name=self.device, num_requests=1)
         
 
     def predict(self, image):
@@ -52,23 +39,9 @@ class Face_detection:
 
         if self.wait() == 0:
             outputs = self.network.requests[0].outputs[self.output_name]
+            bbox, image_copy = self.preprocess_output(outputs, image)
 
-
-
-    def check_model(self):
-        raise NotImplementedError
-
-    def preprocess_input(self, image):
-    '''
-    Before feeding the data into the model for inference,
-    you might have to preprocess it. This function is where you can do that.
-    '''
-        w, h = self.input_shape[3], self.input_shape[2]
-        image = cv2.resize(image, (w, h))
-        image = image.transpose((2, 0, 1))
-        image = image.reshape(1, 3, h, w)
-
-        return image
+        return bbox, image_copy
 
     def preprocess_output(self, coords, image):
     '''
@@ -92,7 +65,3 @@ class Face_detection:
                 image_copy = image[ymin:ymax, xmin:xmax]
 
         return bbox, image_copy
-
-    def wait(self):
-        
-        return self.network.requests[0].wait(-1)
