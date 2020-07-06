@@ -7,8 +7,8 @@ class Model_X:
     Class for the Face Detection Model.
     '''
     def __init__(self, model_path, device='CPU', extensions=None, threshold=0.6):
-        self.model_weights=model_path+'.bin'
-        self.model_structure=model_path+'.xml'
+        self.model_weights=model_path.replace('.xml', '.bin')
+        self.model_structure=model_path
         self.device=device
         self.threshold=threshold
         self.logger = logging.getLogger('fd')
