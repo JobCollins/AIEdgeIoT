@@ -4,11 +4,11 @@ class Landmark_Detection(Model_X):
     '''
     Class for the Face Detection Model.
     '''
-    def __init__(self, model_name, device='CPU', extensions=None):
+    def __init__(self, model_name, device='CPU', extensions=None, threshold=0.6):
         '''
         TODO: Use this to set your instance variables.
         '''
-        Model_X.__init__(self, model_name, device='CPU',extensions=None, threshold=0.6)
+        Model_X.__init__(self, model_path, device='CPU',extensions, threshold)
         self.model_name = 'Facial Landmarks Detection'
         self.input_name = next(iter(self.model.inputs))
         self.input_shape = self.model.inputs[self.input_name].shape

@@ -1,18 +1,18 @@
-'''
-This is a sample class for a model. You may choose to use it as-is or make any changes to it.
-This has been provided just to give you an idea of how to structure your model class.
-'''
+from openvino.inference_engine import IECore, IENetwork
+import cv2
+import logging
 
 class Model_X:
     '''
     Class for the Face Detection Model.
     '''
-    def __init__(self, model_name, device='CPU', extensions=None, threshold=0.6):
-        self.model_name = None
-        self.model_weights=model_name+'.bin'
-        self.model_structure=model_name+'.xml'
+    def __init__(self, model_path, device='CPU', extensions=None, threshold=0.6):
+        self.model_weights=model_path+'.bin'
+        self.model_structure=model_path+'.xml'
         self.device=device
         self.threshold=threshold
+        self.logger = logging.getLogger('fd')
+        self.model_name = 'Some Model'
         self.input_name = None
         self.input_shape = None
         self.output_name = None
