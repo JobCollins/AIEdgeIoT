@@ -4,11 +4,11 @@ class Gaze_estimation(Model_X):
     '''
     Class for the Face Detection Model.
     '''
-    def __init__(self, model_name, device='CPU', extensions=None, threshold=0.6):
+    def __init__(self, model_path, device='CPU', extensions=None, threshold=0.6):
         '''
         TODO: Use this to set your instance variables.
         '''
-        Model_X.__init__(self, model_name, device='CPU',extensions, threshold)
+        Model_X.__init__(self, model_path, device, extensions, threshold)
         self.model_name = 'Gaze Esimation'
         self.input_name = [k for k in self.model.inputs.keys()]
         self.input_shape = self.model.inputs[self.input_name[1]].shape
@@ -38,10 +38,10 @@ class Gaze_estimation(Model_X):
 
 
     def preprocess_output(self, outputs, coords):
-    '''
-    Before feeding the output of this model to the next model,
-    you might have to preprocess the output. This function is where you can do that.
-    '''
+        '''
+        Before feeding the output of this model to the next model,
+        you might have to preprocess the output. This function is where you can do that.
+        '''
         mouse_coords = (0, 0)
         gaze_coords = outputs[self.output_name[0][0]]
 

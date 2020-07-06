@@ -4,11 +4,11 @@ class Head_pose(Model_X):
     '''
     Class for the Face Detection Model.
     '''
-    def __init__(self, model_name, device='CPU', extensions=None, threshold=0.6):
+    def __init__(self, model_path, device='CPU', extensions=None, threshold=0.6):
         '''
         TODO: Use this to set your instance variables.
         '''
-        Model_X.__init__(self, model_name, device='CPU', extensions, threshold)
+        Model_X.__init__(self, model_path, device, extensions, threshold)
         self.model_name = 'Head Pose Estimation'
         self.input_name = next(iter(self.model.inputs))
         self.input_shape = self.model.inputs[self.input_name].shape
@@ -33,16 +33,16 @@ class Head_pose(Model_X):
 
 
     def preprocess_output(self, outputs):
-    '''
-    Before feeding the output of this model to the next model,
-    you might have to preprocess the output. This function is where you can do that.
-    '''
-       processed_output = []
+        '''
+        Before feeding the output of this model to the next model,
+        you might have to preprocess the output. This function is where you can do that.
+        '''
+        processed_output = []
 
-       processed_output.append(outputs['angle_y_fc'][0][0])
-       processed_output.append(outputs['angle_p_fc'][0][0])
-       processed_output.append(outputs['angle_r_fc'][0][0])
+        processed_output.append(outputs['angle_y_fc'][0][0])
+        processed_output.append(outputs['angle_p_fc'][0][0])
+        processed_output.append(outputs['angle_r_fc'][0][0])
 
-       return processed_output
+        return processed_output
 
 

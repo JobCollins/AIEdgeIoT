@@ -47,7 +47,7 @@ class InputFeeder:
         if not self.input_type=='image':
             self.cap.release()
 
-     def get_fps(self):
+    def get_fps(self):
         '''
         return FPS
         '''

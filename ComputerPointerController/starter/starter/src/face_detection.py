@@ -14,11 +14,11 @@ class Face_detection(Model_X):
     '''
     Class for the Face Detection Model.
     '''
-    def __init__(self, model_name, device='CPU', extensions=None, threshold=0.6):
+    def __init__(self, model_path, device='CPU', extensions=None, threshold=0.6):
         '''
         TODO: Use this to set your instance variables.
         '''
-        Model_X.__init__(self, model_path, device='CPU',extensions, threshold)
+        Model_X.__init__(self, model_path, device, extensions, threshold)
         self.model_name = 'Face Detection'
         self.input_name = next(iter(self.model.inputs))
         self.input_shape = self.model.inputs[self.input_name].shape
@@ -44,10 +44,11 @@ class Face_detection(Model_X):
         return bbox, image_copy
 
     def preprocess_output(self, coords, image):
-    '''
-    Before feeding the output of this model to the next model,
-    you might have to preprocess the output. This function is where you can do that.
-    '''
+
+        '''
+        Before feeding the output of this model to the next model,
+        you might have to preprocess the output. This function is where you can do that.
+        '''
         w, h = int(image.shape[1]), int(image.shape[0])
         bbox = []
         image_copy = image

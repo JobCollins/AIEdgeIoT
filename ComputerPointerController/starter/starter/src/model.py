@@ -23,7 +23,7 @@ class Model_X:
 
 
     def load_model(self):
-        self.network = elf.core.load_network(network=self.model, device_name=self.device, num_requests=1)
+        self.network = self.core.load_network(network=self.model, device_name=self.device, num_requests=1)
 
     def predict(self):
         pass
@@ -32,10 +32,10 @@ class Model_X:
         pass
 
     def preprocess_input(self, image):
-    '''
-    Before feeding the data into the model for inference,
-    you might have to preprocess it. This function is where you can do that.
-    '''
+        '''
+        Before feeding the data into the model for inference,
+        you might have to preprocess it. This function is where you can do that.
+        '''
         w, h = self.input_shape[3], self.input_shape[2]
         image = cv2.resize(image, (w, h))
         image = image.transpose((2, 0, 1))
@@ -44,10 +44,10 @@ class Model_X:
         return image
 
     def preprocess_output(self, outputs):
-    '''
-    Before feeding the output of this model to the next model,
-    you might have to preprocess the output. This function is where you can do that.
-    '''
+        '''
+        Before feeding the output of this model to the next model,
+        you might have to preprocess the output. This function is where you can do that.
+        '''
         pass
 
     def wait(self):
