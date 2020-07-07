@@ -43,7 +43,7 @@ def build_argparser():
                         help="Specify the target device to infer on:"
                              "CPU, GPU, FPGA or MYRIAD is acceptable")
 
-    parser.add_argument("-o", '--output_path', default='/results/', type=str)
+    parser.add_argument("-o", '--output_path', default='./results/', type=str)
 
     parser.add_argument("-flag", "--bbox_flag", required=False, nargs='+',
                         default=[],
