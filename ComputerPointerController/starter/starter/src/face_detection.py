@@ -2,12 +2,8 @@
 This is a sample class for a model. You may choose to use it as-is or make any changes to it.
 This has been provided just to give you an idea of how to structure your model class.
 '''
-import os
-import sys
-import cv2
-import logging as log
-from openvino.inference_engine import IENetwork, IECore
 
+import numpy as np
 from model import Model_X
 
 class Face_detection(Model_X):
@@ -32,14 +28,19 @@ class Face_detection(Model_X):
         TODO: You will need to complete this method.
         This method is meant for running predictions on the input image.
         '''
-        pred_img = self.preprocess_input(image)
-        self.network.start_async(
-            request_id=0, inputs={self.input_name: pred_img}
-        )
+        try:
 
-        if self.wait() == 0:
-            outputs = self.network.requests[0].outputs[self.output_name]
-            bbox, image_copy = self.preprocess_output(outputs, image)
+            pred_img = self.preprocess_input(image)
+            self.network.start_async(
+                request_id=0, inputs={self.input_name: pred_img}
+            )
+
+            if self.wait() == 0:
+                outputs = self.network.requests[0].outputs[self.output_name]
+                bbox, image_copy = self.preprocess_output(outputs, image)
+
+        except Exception as e:
+            self.logger.error("Error in Face Detection Model prediction: " + str(e))
 
         return bbox, image_copy
 
@@ -54,15 +55,21 @@ class Face_detection(Model_X):
         image_copy = image
         coords = np.squeeze(coords)
 
-        for coord in coords:
-            image_id, label, threshold, xmin, ymin, xmax, ymax = coord
-            
-            if label==1 and threshold >= self.threshold:
-                xmin = int(xmin * w)
-                ymin = int(ymin * h)
-                xmax = int(xmax * w)
-                ymax = int(ymax * h)
-                bbox.append([xmin, ymin, xmax, ymax])
-                image_copy = image[ymin:ymax, xmin:xmax]
+        try:
+            for coord in coords:
+                image_id, label, threshold, xmin, ymin, xmax, ymax = coord
+                
+                if image_id == -1:
+                    break
+                if label == 1 and threshold >= self.threshold:
+                    xmin = int(xmin * w)
+                    ymin = int(ymin * h)
+                    xmax = int(xmax * w)
+                    ymax = int(ymax * h)
+                    bbox.append([xmin, ymin, xmax, ymax])
+                    image_copy = image[ymin:ymax, xmin:xmax]
+
+        except Exception as e:
+            self.logger.error("Error drawing bounding boxes on image in Face Detection Model" + str(e))
 
         return bbox, image_copy

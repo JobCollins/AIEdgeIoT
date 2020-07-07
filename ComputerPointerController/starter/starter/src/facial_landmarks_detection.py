@@ -39,7 +39,7 @@ class Landmark_Detection(Model_X):
         Before feeding the output of this model to the next model,
         you might have to preprocess the output. This function is where you can do that.
         '''
-        w, h = image.shape[1], image.shape[2]
+        w, h = image.shape[1], image.shape[0]  #changed from 2 to 0
         outputs =  outputs[0]
         
         left_eye_xmin = int(outputs[0][0][0] * w) - 10

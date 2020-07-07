@@ -1,4 +1,5 @@
 from model import Model_X
+import math
 
 class Gaze_estimation(Model_X):
     '''
@@ -15,7 +16,7 @@ class Gaze_estimation(Model_X):
         self.output_name = [k for k in self.model.outputs.keys()]
 
     
-    def predict(self, left_eye, right_eye, coords, request_id):
+    def predict(self, left_eye, right_eye, hp_coords, request_id=0):
         '''
         TODO: You will need to complete this method.
         This method is meant for running predictions on the input image.
@@ -23,21 +24,21 @@ class Gaze_estimation(Model_X):
         left_eye = self.preprocess_input(left_eye)
         right_eye = self.preprocess_input(right_eye)
         self.network.start_async(
-            request_id=0, 
+            request_id, 
             inputs={
             'left_eye': left_eye,
             'right_eye': right_eye,
-            'head_pose_coords': coords
+            'head_pose_coords': hp_coords #changed from coords to hp_coords
             })
 
         if self.wait() == 0:
             outputs = self.network.requests[0].outputs
-            mouse_coords, gaze_coords = self.preprocess_output(outputs, coords)
+            mouse_coords, gaze_coords = self.preprocess_output(outputs, hp_coords)
 
         return mouse_coords, gaze_coords
 
 
-    def preprocess_output(self, outputs, coords):
+    def preprocess_output(self, outputs, hp_coords):
         '''
         Before feeding the output of this model to the next model,
         you might have to preprocess the output. This function is where you can do that.
@@ -45,7 +46,7 @@ class Gaze_estimation(Model_X):
         mouse_coords = (0, 0)
         gaze_coords = outputs[self.output_name[0][0]]
 
-        angle_r_fc = coords[2]
+        angle_r_fc = hp_coords[2]
         sin_r = math.sin(angle_r_fc * math.pi / 180.0)
         cos_r = math.cos(angle_r_fc * math.pi / 180.0)
 

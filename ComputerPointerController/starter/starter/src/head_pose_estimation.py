@@ -26,10 +26,10 @@ class Head_pose(Model_X):
         )
 
         if self.wait() == 0:
-            outputs = self.network.requests[0].output_shape
-            output = self.preprocess_output(outputs)
+            outputs = self.network.requests[0].outputs[self.output_name]
+            p_output = self.preprocess_output(outputs)
 
-        return output
+        return p_output  #changed from output to p_output
 
 
     def preprocess_output(self, outputs):

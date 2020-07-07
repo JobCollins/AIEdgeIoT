@@ -50,7 +50,7 @@ def build_argparser():
                         help="flag ffd ffl fhp fgz (Seperated by space)"
                              "for model outputs detections of each frame,"
                              "ffd for Face Detection Model, ffl for Facial Landmark Detection Model"
-                             "fhp for Head Pose Estimation Model, fgz for Gaze Estimation Model.")
+                             "fhp for Head Pose Estimation Model, fgz for Gaze Estimation Model.")  #changed CLI command
 
     return parser
 
@@ -62,33 +62,24 @@ def draw_bbox(frame, bbox_flag, image_copy, left_eye, right_eye, face_coords, ey
     if 'ffd' in bbox_flag:
         if len(bbox_flag) != 1:
             bbox_frame = image_copy
-        cv2.rectangle(frame, (face_coords[0][0], face_coords[0][1]), (face_coords[0][2], face_coords[0][3]),
-                      (0, 0, 0), 3)
+        cv2.rectangle(frame, (face_coords[0][0], face_coords[0][1]), (face_coords[0][2], face_coords[0][3]), (0, 0, 0), 3)
 
     if 'ffl' in bbox_flag:
-        cv2.rectangle(image_copy, (eye_coords[0][0]-10, eye_coords[0][1]-10), (eye_coords[0][2]+10, eye_coords[0][3]+10),
-                      (255, 0, 0), 2)
-        cv2.rectangle(image_copy, (eye_coords[1][0]-10, eye_coords[1][1]-10), (eye_coords[1][2]+10, eye_coords[1][3]+10),
-                      (255, 0, 0), 2)
+        cv2.rectangle(image_copy, (eye_coords[0][0]-10, eye_coords[0][1]-10), (eye_coords[0][2]+10, eye_coords[0][3]+10), (255, 0, 0), 2)
+        cv2.rectangle(image_copy, (eye_coords[1][0]-10, eye_coords[1][1]-10), (eye_coords[1][2]+10, eye_coords[1][3]+10), (255, 0, 0), 2)
 
-    if 'fh' in bbox_flag:
+    if 'fhp' in bbox_flag:   #changed from fh to fhp
         cv2.putText(
             frame,
             "Head Pose Angles: yaw= {:.2f} , pitch= {:.2f} , roll= {:.2f}".format(
-                hp_output[0], hp_output[1], hp_output[2]),
-            (20, 40),
-            cv2.FONT_HERSHEY_COMPLEX,
-            1, (0, 0, 0), 2)
+                hp_output[0], hp_output[1], hp_output[2]), (20, 40),cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 0), 2)
 
-    if 'fg' in bbox_flag:
+    if 'fgz' in bbox_flag:   #changed from fg to fgz
 
         cv2.putText(
             frame,
             "Gaze Coords: x= {:.2f} , y= {:.2f} , z= {:.2f}".format(
-                gaze_coords[0], gaze_coords[1], gaze_coords[2]),
-            (20, 80),
-            cv2.FONT_HERSHEY_COMPLEX,
-            1, (0, 0, 0), 2)
+                gaze_coords[0], gaze_coords[1], gaze_coords[2]), (20, 80), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 0), 2)
 
         x, y, w = int(gaze_coords[0] * 12), int(gaze_coords[1] * 12), 160
         le = cv2.line(left_eye.copy(), (x - w, y - w), (x + w, y + w), (255, 0, 255), 2)
@@ -175,7 +166,7 @@ def main():
 
             left_eye, right_eye, eye_coords = facial_landmarks_detection_model.predict(image_copy)
             hp_output = head_pose_estimation_model.predict(image_copy)
-            mouse_coord, gaze_coords = gaze_estimation_model.predict(left_eye, right_eye, hp_output)
+            mouse_coords, gaze_coords = gaze_estimation_model.predict(left_eye, right_eye, hp_output)
 
         except Exception as e:
             logger.warning("Could predict using model" + str(e) + " for frame " + str(frame_count))
@@ -193,7 +184,7 @@ def main():
         out_video.write(frame)
 
         if frame_count % 5 == 0 and not is_benchmarking:
-            mouse_controller.move(mouse_coord[0], mouse_coord[1])
+            mouse_controller.move(mouse_coords[0], mouse_coords[1])
 
         if key == 27:
             break
