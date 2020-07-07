@@ -26,7 +26,7 @@ class Head_pose(Model_X):
         )
 
         if self.wait() == 0:
-            outputs = self.network.requests[0].outputs[self.output_name]
+            outputs = self.network.requests[0].outputs
             p_output = self.preprocess_output(outputs)
 
         return p_output  #changed from output to p_output

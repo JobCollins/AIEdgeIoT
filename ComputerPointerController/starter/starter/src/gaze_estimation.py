@@ -26,9 +26,9 @@ class Gaze_estimation(Model_X):
         self.network.start_async(
             request_id, 
             inputs={
-            'left_eye': left_eye,
-            'right_eye': right_eye,
-            'head_pose_coords': hp_coords #changed from coords to hp_coords
+            'left_eye_image': left_eye,
+            'right_eye_image': right_eye,
+            'head_pose_angles': hp_coords #changed from coords to hp_coords
             })
 
         if self.wait() == 0:
@@ -44,7 +44,7 @@ class Gaze_estimation(Model_X):
         you might have to preprocess the output. This function is where you can do that.
         '''
         mouse_coords = (0, 0)
-        gaze_coords = outputs[self.output_name[0][0]]
+        gaze_coords = outputs[self.output_name[0]][0]  #bracket mistakes moved
 
         angle_r_fc = hp_coords[2]
         sin_r = math.sin(angle_r_fc * math.pi / 180.0)
