@@ -34,7 +34,7 @@ The project uses the Gaze Estimation model to estimate the gaze of the user's ey
 
 At this point a small video window should appear and start controlling your mouse depending on the gazes in the video.
 
-![outputVideo](/src/output_video.mp4)
+![outputVideo](./src/output_video.mp4)
 
 ## Documentation
 
