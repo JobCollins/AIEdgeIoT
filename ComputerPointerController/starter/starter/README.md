@@ -72,13 +72,13 @@ This folder contains the `demo.mp4` video file that is used to test the models &
 Benchmarks can include: model loading time, input/output processing time, model inference time etc.
 
 ### Model Loading Time (Sync)
-![mlt](model_loading_time.png)
+![mlt](./src/model_loading_time.png)
 
 ### Model Inference Time (Sync)
-![inference](inference_time.png)
+![inference](./src/inference_time.png)
 
 ### Frames Per Second (Sync)
-![fps](fps.png)
+![fps](./src/fps.png)
 
 
 ## Results
@@ -89,13 +89,13 @@ Benchmarks can include: model loading time, input/output processing time, model 
 
 ### Async Inference
 ### Model Loading Time (Sync)
-![mlt](asyncMlt.png)
+![mlt](./src/asyncMlt.png)
 
 ### Model Inference Time (Sync)
-![inference](asyncInference.png)
+![inference](./src/asyncInference.png)
 
 ### Frames Per Second (Sync)
-![fps](asyncfps.png)
+![fps](./src/asyncfps.png)
 
 
 ### Edge Cases
