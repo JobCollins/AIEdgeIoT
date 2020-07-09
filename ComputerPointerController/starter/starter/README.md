@@ -88,13 +88,13 @@ Benchmarks can include: model loading time, input/output processing time, model 
 .
 
 ### Async Inference
-### Model Loading Time (Sync)
+### Model Loading Time
 ![mlt](./src/asyncMlt.png)
 
-### Model Inference Time (Sync)
+### Model Inference Time
 ![inference](./src/asyncInference.png)
 
-### Frames Per Second (Sync)
+### Frames Per Second
 ![fps](./src/asyncfps.png)
 
 
