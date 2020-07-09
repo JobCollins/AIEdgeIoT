@@ -69,16 +69,35 @@ This folder contains the `demo.mp4` video file that is used to test the models &
 
 
 ## Benchmarks
-*TODO:* Include the benchmark results of running your model on multiple hardwares and multiple model precisions. Your benchmarks can include: model loading time, input/output processing time, model inference time etc.
+Benchmarks can include: model loading time, input/output processing time, model inference time etc.
+
+### Model Loading Time (Sync)
+![mlt](model_loading_time.png)
+
+### Model Inference Time (Sync)
+![inference](inference_time.png)
+
+### Frames Per Second (Sync)
+![fps](fps.png)
+
 
 ## Results
-*TODO:* Discuss the benchmark results and explain why you are getting the results you are getting. For instance, explain why there is difference in inference time for FP32, FP16 and INT8 models.
+`FP32-INT8` has the highest model loading time since it combines two precisions and thus, heavier model weight. `FP16` has the least loading time.
+`FP32` generally (and relatively) performs better than the rest of the precisions.
 
-## Stand Out Suggestions
-This is where you can provide information about the stand out suggestions that you have attempted.
+.
 
 ### Async Inference
-If you have used Async Inference in your code, benchmark the results and explain its effects on power and performance of your project.
+### Model Loading Time (Sync)
+![mlt](asyncMlt.png)
+
+### Model Inference Time (Sync)
+![inference](asyncInference.png)
+
+### Frames Per Second (Sync)
+![fps](asyncfps.png)
+
 
 ### Edge Cases
-There will be certain situations that will break your inference flow. For instance, lighting changes or multiple people in the frame. Explain some of the edge cases you encountered in your project and how you solved them to make your project more robust.
+The model only detects one face even when there are multiple faces. This deals with the issues of multiple people scenario. 
+Also for the lighting, HSV preprocessing can be used regularize errors from poor lighting conditions.
