@@ -55,14 +55,14 @@ def build_argparser():
     return parser
 
 
-def draw_bbox(frame, bbox_flag, image_copy, l_eye, r_eye, face_coords, eyes, hp_output, gaze_coords):
+def draw_bbox(frame, bbox_flag, image_copy, l_eye, r_eye, face_bbox, eyes, hp_output, gaze_coords):
 
     bbox_frame = frame.copy()
 
     if 'ffd' in bbox_flag:
         if len(bbox_flag) != 1:
             bbox_frame = image_copy
-        cv2.rectangle(frame, (face_coords[0][0], face_coords[0][1]), (face_coords[0][2], face_coords[0][3]), (0, 0, 0), 3)
+        cv2.rectangle(frame, (face_bbox[0][0], face_bbox[0][1]), (face_bbox[0][2], face_bbox[0][3]), (0, 0, 0), 3)
 
     if 'ffl' in bbox_flag:
         cv2.rectangle(image_copy, (eyes[0][0], eyes[0][1]), (eyes[0][2], eyes[0][3]), (255, 0, 0), 2)
