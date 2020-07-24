@@ -44,7 +44,7 @@ class Face_detection(Model_X):
 
         return bbox, image_copy
 
-    def preprocess_output(self, coords, image):
+    def preprocess_output(self, outputs, image):
 
         '''
         Before feeding the output of this model to the next model,
@@ -53,11 +53,11 @@ class Face_detection(Model_X):
         w, h = int(image.shape[1]), int(image.shape[0])
         bbox = []
         image_copy = image
-        coords = np.squeeze(coords)
+        outputs = np.squeeze(outputs)
 
         try:
-            for coord in coords:
-                image_id, label, threshold, xmin, ymin, xmax, ymax = coord
+            for output in outputs:
+                image_id, label, threshold, xmin, ymin, xmax, ymax = output
                 
                 if image_id == -1:
                     break

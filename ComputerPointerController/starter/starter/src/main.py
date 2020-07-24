@@ -55,7 +55,7 @@ def build_argparser():
     return parser
 
 
-def draw_bbox(frame, bbox_flag, image_copy, left_eye, right_eye, face_coords, eye_coords, hp_output, gaze_coords):
+def draw_bbox(frame, bbox_flag, image_copy, l_eye, r_eye, face_coords, eyes, hp_output, gaze_coords):
 
     bbox_frame = frame.copy()
 
@@ -65,29 +65,22 @@ def draw_bbox(frame, bbox_flag, image_copy, left_eye, right_eye, face_coords, ey
         cv2.rectangle(frame, (face_coords[0][0], face_coords[0][1]), (face_coords[0][2], face_coords[0][3]), (0, 0, 0), 3)
 
     if 'ffl' in bbox_flag:
-        cv2.rectangle(image_copy, (eye_coords[0][0]-10, eye_coords[0][1]-10), (eye_coords[0][2]+10, eye_coords[0][3]+10), (255, 0, 0), 2)
-        cv2.rectangle(image_copy, (eye_coords[1][0]-10, eye_coords[1][1]-10), (eye_coords[1][2]+10, eye_coords[1][3]+10), (255, 0, 0), 2)
+        cv2.rectangle(image_copy, (eyes[0][0], eyes[0][1]), (eyes[0][2], eyes[0][3]), (255, 0, 0), 2)
+        cv2.rectangle(image_copy, (eyes[1][0], eyes[1][1]), (eyes[1][2], eyes[1][3]), (255, 0, 0), 2)
 
     if 'fhp' in bbox_flag:   #changed from fh to fhp
         cv2.putText(
             frame,
-            "Head Pose Angles: yaw= {:.2f} , pitch= {:.2f} , roll= {:.2f}".format(
-                hp_output[0], hp_output[1], hp_output[2]), (20, 40),cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 0), 2)
+            "Head Pose Angles: yaw= {:.2f} , pitch= {:.1f} , roll= {:.1f}".format(
+                hp_output[0], hp_output[1], hp_output[2]), (20, 20),cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 0, 0), 1)
 
     if 'fgz' in bbox_flag:   #changed from fg to fgz
 
         cv2.putText(
             frame,
             "Gaze Coords: x= {:.2f} , y= {:.2f} , z= {:.2f}".format(
-                gaze_coords[0], gaze_coords[1], gaze_coords[2]), (20, 80), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 0), 2)
+                gaze_coords[0], gaze_coords[1], gaze_coords[2]), (20, 80), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 0, 0), 2)
 
-        x, y, w = int(gaze_coords[0] * 12), int(gaze_coords[1] * 12), 160
-        le = cv2.line(left_eye.copy(), (x - w, y - w), (x + w, y + w), (255, 0, 255), 2)
-        cv2.line(le, (x - w, y + w), (x + w, y - w), (255, 0, 255), 2)
-        re = cv2.line(right_eye.copy(), (x - w, y - w), (x + w, y + w), (255, 0, 255), 2)
-        cv2.line(re, (x - w, y + w), (x + w, y - w), (255, 0, 255), 2)
-        bbox_frame[eye_coords[0][1]:eye_coords[0][3], eye_coords[0][0]:eye_coords[0][2]] = le
-        bbox_frame[eye_coords[1][1]:eye_coords[1][3], eye_coords[1][0]:eye_coords[1][2]] = re
 
     return bbox_frame
 
@@ -156,7 +149,7 @@ def main():
         key = cv2.waitKey(60)
 
         try:
-            face_coords, image_copy = face_detection_model.predict(frame)
+            face_bbox, image_copy = face_detection_model.predict(frame)
 
             if type(image_copy) == int:
                 logger.warning("Unable to detect the face")
@@ -164,9 +157,9 @@ def main():
                     break
                 continue
 
-            left_eye, right_eye, eye_coords = facial_landmarks_detection_model.predict(image_copy)
+            l_eye, r_eye, eyes = facial_landmarks_detection_model.predict(image_copy)
             hp_output = head_pose_estimation_model.predict(image_copy)
-            mouse_coords, gaze_coords = gaze_estimation_model.predict(left_eye, right_eye, hp_output)
+            mouse_coords, gaze_coords = gaze_estimation_model.predict(l_eye, r_eye, hp_output)
 
         except Exception as e:
             logger.warning("Could predict using model" + str(e) + " for frame " + str(frame_count))
@@ -176,8 +169,8 @@ def main():
 
         if not len(bbox_flag) == 0:
             bbox_frame = draw_bbox(
-                frame, bbox_flag, image_copy, left_eye, right_eye,
-                face_coords, eye_coords, hp_output, gaze_coords)
+                frame, bbox_flag, image_copy, l_eye, r_eye,
+                face_bbox, eyes, hp_output, gaze_coords)
             image = np.hstack((cv2.resize(frame, (500, 500)), cv2.resize(bbox_frame, (500, 500))))
 
         cv2.imshow('preview', image)

@@ -25,13 +25,13 @@ class Landmark_Detection(Model_X):
             request_id=0, inputs={self.input_name: pred_img}
         )
 
-        left_eye, right_eye, eye_coords = [], [], []
+        l_eye, r_eye, eyes = [], [], []
 
         if self.wait() == 0:
             outputs = self.network.requests[0].outputs[self.output_name]
-            left_eye, right_eye, eye_coords = self.preprocess_output(outputs, image)
+            l_eye, r_eye, eyes = self.preprocess_output(outputs, image)
 
-        return left_eye, right_eye, eye_coords
+        return l_eye, r_eye, eyes
 
 
     def preprocess_output(self, outputs, image):
@@ -42,20 +42,20 @@ class Landmark_Detection(Model_X):
         w, h = image.shape[1], image.shape[0]  #converted to int
         outputs =  outputs[0]
         
-        left_eye_xmin = int(outputs[0][0][0] * w) - 10
-        left_eye_ymin = int(outputs[1][0][0] * h) - 10
-        right_eye_xmin = int(outputs[2][0][0] * w) - 10
-        right_eye_ymin = int(outputs[3][0][0] * h) - 10
+        l_eye_xmin = int(outputs[0][0][0] * w) - 10
+        l_eye_ymin = int(outputs[1][0][0] * h) - 10
+        r_eye_xmin = int(outputs[2][0][0] * w) - 10
+        r_eye_ymin = int(outputs[3][0][0] * h) - 10
 
-        left_eye_xmax = int(outputs[0][0][0] * w) + 10
-        left_eye_ymax = int(outputs[1][0][0] * h) + 10
-        right_eye_xmax = int(outputs[2][0][0] * w) + 10
-        right_eye_ymax = int(outputs[3][0][0] * h) + 10
+        l_eye_xmax = int(outputs[0][0][0] * w) + 10
+        l_eye_ymax = int(outputs[1][0][0] * h) + 10
+        r_eye_xmax = int(outputs[2][0][0] * w) + 10
+        r_eye_ymax = int(outputs[3][0][0] * h) + 10
 
-        left_eye , right_eye, eye_coords = [], [], []
+        l_eye , r_eye, eyes = [], [], []
 
-        left_eye = image[left_eye_ymin:left_eye_ymax, left_eye_xmin:left_eye_xmax]
-        right_eye = image[right_eye_ymin:right_eye_ymax, right_eye_xmin:right_eye_xmax]
-        eye_coords = [[left_eye_xmin, left_eye_ymin, left_eye_xmax, left_eye_ymax], [right_eye_xmin, right_eye_ymin, right_eye_xmax, right_eye_ymax]]
+        l_eye = image[l_eye_ymin:l_eye_ymax, l_eye_xmin:l_eye_xmax]
+        r_eye = image[r_eye_ymin:r_eye_ymax, r_eye_xmin:r_eye_xmax]
+        eyes = [[l_eye_xmin, l_eye_ymin, l_eye_xmax, l_eye_ymax], [r_eye_xmin, r_eye_ymin, r_eye_xmax, r_eye_ymax]]
 
-        return left_eye, right_eye, eye_coords
+        return l_eye, r_eye, eyes
