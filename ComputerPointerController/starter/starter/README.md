@@ -1,6 +1,6 @@
 # Computer Pointer Controller
 
-The Computer Pointer Controller is an AI project that is part of the Intel Edge AI for IoT Nanodegree curriculum. In this project, the ability to run multiple models in the same machine and coordinate the flow of data between those models.
+The Computer Pointer Controller is an AI project that is part of the Intel Edge AI for IoT Nanodegree projects. In this project, the ability to run multiple models in the same machine and coordinate the flow of data between those models.
 
 The project uses the Gaze Estimation model to estimate the gaze of the user's eyes and change the mouse pointer position accordingly. Along with this model, the face detection, landmarks regression, and head pose estimation models are used.
 
