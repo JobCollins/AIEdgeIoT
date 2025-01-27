@@ -1,6 +1,5 @@
 # AIEdgeIoT
 
-Repository of my Intel Edge AI for IoT Nanodegree projects
 
 ## People Counter App
 
